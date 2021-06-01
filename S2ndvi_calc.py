@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+import os
 import argparse
 import NDVICalc_fuctions as ndvi
 
 def main(command_line=None):
-    parser = argparse.ArgumentParser('NDVI Calculation')
+    parser = argparse.ArgumentParser('Sentinel 2: NDVI Calculation')
 
     parser.add_argument(
         '--debug',
@@ -17,21 +18,26 @@ def main(command_line=None):
 
     latest = subprasers.add_parser('latest', help='calculate the average NDVI based on a latest scene available')
     latest.add_argument(
-        'geometry',
-        help='Study Area to analyse in GEOJSON format (optional)',
-        default="Döberitzer Heide Nature Reserve",
-        nargs='?'
-    )
-    latest.add_argument(
-        'cloud-coverage',
+        '-cloudperc',
         help='Percentage of cloud cover in the scene (optional)',
-        default="100",
+        default= 100,
+        type=int,
         nargs='?'
     )
+
     latest.add_argument(
-        'descriptors',
-        help='what to praise for (optional)',
-        default="no reason",
+        '-stats',
+        help='descriptors to calculate (mean, median, mode, max, min, std) default -> [mean,mode,std] (optional)',
+        default= ['mean','mode','std'],
+        choices=['mean', 'median', 'mode', 'max', 'min', 'std'],
+        nargs='+'
+    )
+
+    latest.add_argument(
+        '-geometry',
+        help='Study Area to analyse in GEOJSON format (optional)',
+        type=str,
+        default="./default/geometry/geometry.geojson",
         nargs='?'
     )
 
@@ -43,9 +49,25 @@ def main(command_line=None):
     if args.debug:
         print("debug: " + str(args))
     if args.command == 'latest':
-        ndvi.calculation()
+
+        while True:
+            if(os.path.isfile(args.geometry) and args.geometry.endswith(".geojson") ):
+                print("[INFO] Geojson path validated")
+            else:
+                print("[ERROR] Please check the path given")
+                break
+            
+            if(args.cloudperc >= 0 and args.cloudperc <= 100):
+                print("[INFO] Cloud Percentage validated")
+            else:
+                print("[ERROR] Cloud Percentage Parameter must be from 0 to 100")
+                break
+            print("[INFO] NDVI calculation running ...")
+            ndvi.calculation(args.cloudperc,args.stats,args.geometry)
+            break
+
     elif args.command == 'dates':
-        print('Still in development')
+        print('Still on development')
 
 
 if __name__ == '__main__':

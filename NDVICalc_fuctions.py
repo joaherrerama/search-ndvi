@@ -1,21 +1,24 @@
-import intake
 import satsearch
-import datetime as date 
+import datetime as date
+from dateutil.relativedelta import *
 import json
 import numpy as np
 import matplotlib.pyplot as plt
 import rasterio as rio
-from rasterio.plot import show
 import time
+import intake
+from scipy import stats as st
 
 
-
-def data_requestion_Element84(geojson):  
-
+def data_requesting_Element84(geojson,cloud): 
+ 
+    """
+        This function send the parametes and geomtry to the STAC API and retrieve all available datasets
+        that are suitable based on the inputs (geometry,cloud) provided by the user.
+    """
     now = date.datetime.now()
-    print(now)
-    dates = '2018-02-01/2018-12-04'
-
+    last_month = now+relativedelta(months=-1)
+    dates = str(last_month.strftime("%Y-%m-%d")) + '/' + str(now.strftime("%Y-%m-%d"))
 
     URL='https://earth-search.aws.element84.com/v0'
     results = satsearch.Search.search(url=URL,
@@ -23,20 +26,24 @@ def data_requestion_Element84(geojson):
                                     datetime=dates,
                                     intersects=geojson,
                                     query={
-                                        'eo:cloud_cover': {'lt': 10},
-                                        'sentinel:data_coverage':{'gt': 50}
+                                        'eo:cloud_cover': {'lt': cloud},
+                                        'sentinel:data_coverage':{'gt': 70}
                                     }
     )
 
-    print('%s items' % results.found())
     items = results.items()
     # Save this locally for use later
-    items.save('my-s2-l2a-cogs.json')
+    items.save('default/temp/my-s2-l2a-cogs.json')
     return items
 
-def load_geojson(url='default/geometry/geometry.geojson'):
-    with open(url) as f:
-        return json.load(f)['features'][0]['geometry']
+def load_geojson(url):
+    try:
+        with open(url) as f:
+            features = json.load(f)['features']
+            print("[INFO] The Geojson has ", len(features)," feature(s)")
+            return features
+    except:
+        print("[ERROR] The Geojson file seems to be corrupted. Check the structure please")
 
 def NDVI_single_scene(items):
     """
@@ -44,8 +51,6 @@ def NDVI_single_scene(items):
         Input:
             - items
     """
-    stats = {}
-
     # Read and open(B4 and B8)
     b4 = rio.open(items[0].asset("red")["href"])
     b8 = rio.open(items[0].asset("nir")["href"])
@@ -55,12 +60,10 @@ def NDVI_single_scene(items):
     # Calculate ndvi
     ndvi = (nir.astype(float)-red.astype(float))/(nir+red)
 
-
-    print(np.nanmean(ndvi))
-
-    return stats
+    return ndvi
 
 def NDVI_multiple_scenes(items):
+
     stats = {}
     catalog = intake.open_stac_item_collection(items)
     latest = str(list(catalog)[0])
@@ -83,18 +86,67 @@ def NDVI_multiple_scenes(items):
 
     return stats
 
-def calculation():
+def calculate_stats(stats,ndvi):
+    """
+        The funtion calculate the statistcs based on parameter -stat provided by the user
+        options:
+            - mean:
+            - median:
+            - mode
+            - max
+            - min
+            - std
+    """
+    stat = {}
+    for i in stats:
+        
+        result = {
+        'mean': np.nanmean(ndvi),
+        'median': np.nanmedian(ndvi),
+        'mode': st.mode(ndvi),
+        'max': np.nanmax(ndvi),
+        'min': np.nanmin(ndvi),
+        'std': np.nanstd(ndvi)
+        }[i]
+
+        stat[i] = result
+    
+    print(stat)
+    
+    return stat
+
+
+def calculation(cloud,stats,path):
+    """
+        This function present the general workflow for all the calculation
+        Geojson loading  -> data acquisition -> NDVI calculation -> Results
+    """
+    # Starting time (measure time performing)
     start = time.time()
+    result_list = {}
+    geojson = load_geojson(path)
 
-    geojson = load_geojson()
+    #  Calculating NDVI and stats for each feature from the GEOJSON
+    for i in range(len(geojson)):
 
-    items = data_requestion_Element84(geojson)  
+        print("[STEP] Data acquisition process -> feature ", i )
+        
+        items = data_requesting_Element84(geojson[i]['geometry'],cloud)  
+        
+        print("[STEP] NDVI Calculation process -> feature ", i)
 
-    result = NDVI_single_scene(items)
+        NDVI = NDVI_single_scene(items)
 
-    print("[INFO] The statistics calculated from NDVI Scene(s) are:")
-    print(result)
-    print("[INFO] Time of excecution was (seconds):")
+        print("[STEP] Statistics calculation process -> feature ", i)
+
+        result = calculate_stats(stats,NDVI)
+
+        catalog = intake.open_stac_item_collection(items)
+        latest = str(list(catalog)[0])
+        result_list[i] = {latest: result}
+
+    print("[RESULT] The statistics calculated from NDVI Scene(s) are:")
+    print(result_list)
     end = time.time()
-    print(end - start)
+    print("[TIME] Time of excecution was (seconds): ", end - start)
 
