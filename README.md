@@ -117,7 +117,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Jorge Herrera - [@joaherrerama](https://twitter.com/joaherrerama) - herreram.jahm@gmail.com
 
 LinkedIn: [https://www.linkedin.com/in/jorgeaherreram/](https://www.linkedin.com/in/jorgeaherreram/)
-GitHub: [https://www.linkedin.com/in/jorgeaherreram/](https://www.linkedin.com/in/jorgeaherreram/)
+GitHub: [https://github.com/joaherrerama/](https://github.com/joaherrerama/)
 
 
 

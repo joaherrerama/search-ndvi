@@ -90,8 +90,8 @@ def calculate_stats(stats,ndvi):
     """
         The funtion calculate the statistcs based on parameter -stat provided by the user
         options:
-            - mean:
-            - median:
+            - mean
+            - median
             - mode
             - max
             - min
@@ -99,17 +99,28 @@ def calculate_stats(stats,ndvi):
     """
     stat = {}
     for i in stats:
-        
-        result = {
-        'mean': np.nanmean(ndvi),
-        'median': np.nanmedian(ndvi),
-        'mode': st.mode(ndvi),
-        'max': np.nanmax(ndvi),
-        'min': np.nanmin(ndvi),
-        'std': np.nanstd(ndvi)
-        }[i]
+        #print("[INFO] Calculating", i)
 
-        stat[i] = result
+        if(i == 'mean'):
+            print("[INDEX] Calculating", i)
+            r = np.nanmean(ndvi)
+        elif(i == 'median'):
+            print("[INDEX] Calculating", i)
+            r = np.nanmedian(ndvi)
+        elif(i == 'mode'):
+            print("[INDEX] Calculating", i)
+            r = np.nanmean(ndvi) # CHECK THE FUNCTION
+        elif(i == 'max'):
+            print("[INDEX] Calculating", i)
+            r = np.nanmax(ndvi)
+        elif(i == 'min'):
+            print("[INDEX] Calculating", i)
+            r = np.nanmin(ndvi)
+        elif(i == 'std'):
+            print("[INFO] Calculating", i)
+            r =np.nanstd(ndvi)
+
+        stat[i] = r
     
     print(stat)
     
