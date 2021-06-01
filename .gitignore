@@ -1,0 +1,15 @@
+# Ignore the following folders
+
+env/
+test_files/
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.sw*
+
+# The file containing environment variables 
+.env
+
+# Ohter directories
+__pycache__/
