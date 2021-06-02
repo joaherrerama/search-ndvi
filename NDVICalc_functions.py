@@ -5,10 +5,11 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import rasterio as rio
+from rasterio import mask
 import time
 import intake
 from scipy import stats as st
-
+from pyproj import Proj, transform
 
 def data_requesting_Element84(geojson,cloud): 
  
@@ -32,6 +33,8 @@ def data_requesting_Element84(geojson,cloud):
     )
 
     items = results.items()
+    if(results.found() == 0):
+        items = 'No Data Available'
     # Save this locally for use later
     items.save('default/temp/my-s2-l2a-cogs.json')
     return items
@@ -45,25 +48,68 @@ def load_geojson(url):
     except:
         print("[ERROR] The Geojson file seems to be corrupted. Check the structure please")
 
-def NDVI_single_scene(items):
+def transform_geometry(geometry,crs):
+    inProj = Proj('EPSG:4326')
+    outProj = Proj(crs)
+    print(inProj,outProj)
+    g = json.dumps(geometry)
+    geometry_json = json.loads(g)
+
+    feature_out = geometry_json.copy()
+    new_coords = []
+
+    #all coordinates
+    coords = feature_out['coordinates']
+
+    #coordList is for each individual polygon
+    for coordList in coords:
+
+        #each point in list
+        for coordPair in coordList:
+            x1 = coordPair[1]
+            y1 = coordPair[0]
+            lat_grid, lon_grid = x1, y1
+            #do transformation
+            coordPair[0],coordPair[1] = transform(inProj,outProj,lat_grid, lon_grid)
+
+    return feature_out
+
+def NDVI_single_scene(items,geometry):
     """
-        This fuction calculate NDVI statistics for a single scene
+        This function calculate NDVI statistics for a single scene
+        Input:
+            - items: catalog of images found on the previous step
+            - geometry: Single Feature from Geojson file 
+    """
+
+    src = rio.open(items[0].asset("red")["href"]).crs
+    all_bounds = transform_geometry(geometry,src)
+    all_bound = [all_bounds]
+    try:
+        # Read and open(B4 and B8)
+        with rio.open(items[0].asset("red")["href"]) as src:
+            b4_cropped, b4_transform = rio.mask.mask(src,all_bound, crop=True)
+
+        with rio.open(items[0].asset("nir")["href"]) as src:
+            b8_cropped, b8_transform = rio.mask.mask(src,all_bound, crop=True)
+    
+        red = b4_cropped
+        nir = b8_cropped
+
+        # Calculate ndvi
+        ndvi = (nir-red)/(nir+red)
+
+        return ndvi
+
+    except:
+        print("[ERROR] Please validate that the GEOJSON is in WGS84: Coordinates must be sorted -> [Longitude, Latitude]. ")
+
+def NDVI_multiple_scenes(items):
+    """
+        This function intend to  calculate NDVI statistics for time series dataset
         Input:
             - items
     """
-    # Read and open(B4 and B8)
-    b4 = rio.open(items[0].asset("red")["href"])
-    b8 = rio.open(items[0].asset("nir")["href"])
-    red = b4.read()
-    nir = b8.read()
-
-    # Calculate ndvi
-    ndvi = (nir.astype(float)-red.astype(float))/(nir+red)
-
-    return ndvi
-
-def NDVI_multiple_scenes(items):
-
     stats = {}
     catalog = intake.open_stac_item_collection(items)
     latest = str(list(catalog)[0])
@@ -143,21 +189,32 @@ def calculation(cloud,stats,path):
         print("[STEP] Data acquisition process -> feature ", i )
         
         items = data_requesting_Element84(geojson[i]['geometry'],cloud)  
-        
-        print("[STEP] NDVI Calculation process -> feature ", i)
 
-        NDVI = NDVI_single_scene(items)
+        if(items != 'No Data Available'):
 
-        print("[STEP] Statistics calculation process -> feature ", i)
+            print("[STEP] NDVI Calculation process -> feature ", i)
+            try:
+                NDVI = NDVI_single_scene(items,geojson[i]['geometry'])
+            except:
+                 print("[ERROR] Something went wrong, please check the messages above ")
+                 break
 
-        result = calculate_stats(stats,NDVI)
-
-        catalog = intake.open_stac_item_collection(items)
-        latest = str(list(catalog)[0])
-        result_list[i] = {latest: result}
+            print("[STEP] Statistics calculation process -> feature ", i)
+            
+            try:
+                result = calculate_stats(stats,NDVI)
+            
+                catalog = intake.open_stac_item_collection(items)
+                latest = str(list(catalog)[0])
+                result_list[i] = {latest: result}
+            except:
+                 print("[ERROR] Something went wrong, please check the messages above ")
+                 break
+        else:
+            result_list[i] = {"ERROR": "NO DATA AVAILABLE"}
 
     print("[RESULT] The statistics calculated from NDVI Scene(s) are:")
     print(result_list)
     end = time.time()
-    print("[TIME] Time of excecution was (seconds): ", end - start)
+    print("[TIME] Time of execution was (seconds): ", end - start)
 

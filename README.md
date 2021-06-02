@@ -37,26 +37,26 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-The goal of this challenge is to create a python script to search for Sentinel 2 scenes within a provided geometry and compute an average NDVI (Normalized Difference Vegetation Index) for that area, for the latest available scene in that geometry. The output of such a script would be a single NDVI value (e.g. 0.72) representing the mean NDVI value of the image pixels in the selected geometry.
+The goal of script is to search for Sentinel 2 scenes within a provided geometry and compute an average NDVI (Normalized Difference Vegetation Index) for that area, for the latest available scene in that geometry. The output of such a script would be a single NDVI value (e.g. 0.72) representing the mean NDVI value of the image pixels in the selected geometry.
 
 ###  What does it?
 
-The code is currently on development, therefore, there are a couple of bugs and functionalities to develop. By the moment the command *latest* is one working and calculate the user-defined statistics based on the latest scene available. 
+The code is currently under development. Therefore, there are a couple of bugs and functionalities that are still on developing state. By the moment the command *latest* is one working and calculate the user-defined statistics based on the latest scene available. 
 
-The command argument *dates* is **still on development** and even thought is setting up, the workflow is not yet implemented.
+The command argument *dates* is **still under development** and even thought is set up, the workflow for this command is not yet implemented.
 
 ###  Limitations
 
-* The code limit the user to the latest image and apply a filter based on cloud percentage on the metadata of each scene. It represent that if the are represent a 30% of the image and the scene has 20% os cloud coverage. it might happen that this 20% match with all or part of your zone. 
+* In currently state, the code limits the user to the latest image and applies a filter based on cloud percentage on the metadata of each scene. It represents that if the area of interest represents 30% of the image and the location has 20% of cloud coverage. It might happen that this 20% matches with all or part of your zone.
 
-* It is noteworthy to mention that the statistics are a point of reference for the analysed zone. As a bigger the zone is used a highest bias might be found.
+* It is noteworthy to mention that the statistics are a point of reference for the analyzed zone. A larger bias might be found at larger area (depends on the data properties)
 
-* Execution time is compromise to the size of your inputs as well as the statistics selected and single or temporal analysis.
+* •	Execution time compromises the size of your inputs and the statistics selected, and single or temporal analysis.
 
 
 ### Dependencies
 
-To built this script the following concepts and libraries were applied:
+To built this script, the following concepts and libraries were applied:
 
 * [Python](https://www.python.org/)
 * [STAC](http://sat-utils.github.io/sat-api/)
@@ -71,7 +71,7 @@ To built this script the following concepts and libraries were applied:
 <!-- GETTING STARTED -->
 ## Getting Started
 
-the following script which calculates some statistics of an NDVI raster (Normalized difference vegetation index) is executed through a command line with the following structure:
+the following script which calculates some statistics of an NDVI raster (Normalized difference vegetation index), is executed through a command line with the following structure:
     ```sh
      python .\S2ndvi_calc.py latest -h
      
