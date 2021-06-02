@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import argparse
-import NDVICalc_fuctions as ndvi
+import NDVICalc_functions as ndvi
 
 def main(command_line=None):
     parser = argparse.ArgumentParser('Sentinel 2: NDVI Calculation')
@@ -28,7 +28,7 @@ def main(command_line=None):
     latest.add_argument(
         '-stats',
         help='descriptors to calculate (mean, median, mode, max, min, std) default -> [mean,mode,std] (optional)',
-        default= ['mean','mode','std'],
+        default= ['mean','median','std'],
         choices=['mean', 'median', 'mode', 'max', 'min', 'std'],
         nargs='+'
     )

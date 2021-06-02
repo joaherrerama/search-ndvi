@@ -117,7 +117,7 @@ def calculate_stats(stats,ndvi):
             print("[INDEX] Calculating", i)
             r = np.nanmin(ndvi)
         elif(i == 'std'):
-            print("[INFO] Calculating", i)
+            print("[INDEX] Calculating", i)
             r =np.nanstd(ndvi)
 
         stat[i] = r
