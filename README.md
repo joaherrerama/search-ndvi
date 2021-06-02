@@ -58,13 +58,11 @@ The command argument *dates* is **still on development** and even thought is set
 
 To built this script the following concepts and libraries were applied:
 
-#### Concepts
-
 * [Python](https://www.python.org/)
 * [STAC](http://sat-utils.github.io/sat-api/)
 * [COG](https://www.cogeo.org/)
 
-#### Libraries
+#### Main Libraries
 
 * [Sat-search](https://github.com/sat-utils/sat-search)
 * [intake - stac](https://github.com/intake/intake-stac)
