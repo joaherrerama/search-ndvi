@@ -17,7 +17,10 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="dependencies">Built-with</a></li>
+        <li><a href="#shat-does-it?">What does it?</a></li>
+        <li><a href="#statistics">Statistics</a></li>
+        <li><a href="#limitations">Limitations</a></li>
+        <li><a href="#dependencies">Dependencies</a></li>
       </ul>
     </li>
     <li>
@@ -39,11 +42,23 @@
 
 The goal of script is to search for Sentinel 2 scenes within a provided geometry and compute an average NDVI (Normalized Difference Vegetation Index) for that area, for the latest available scene in that geometry. The output of such a script would be a single NDVI value (e.g. 0.72) representing the mean NDVI value of the image pixels in the selected geometry.
 
-###  What does it?
+### What does it?
 
 The code is currently under development. Therefore, there are a couple of bugs and functionalities that are still on developing state. By the moment the command *latest* is one working and calculate the user-defined statistics based on the latest scene available. 
 
 The command argument *dates* is **still under development** and even thought is set up, the workflow for this command is not yet implemented.
+
+### Statistics
+
+The script allows the user the estimation of different statistics:
+
+* Mean: NDVI mean represent the general value in the hole area. Be cautious about how to interpret this number.
+
+* Mode: NDVI mode represent the more repetitive value found in the image. This might help to understand how the mean is related to the most frequent value.
+* Median: The NDVI median might help you to understand the asymmetry of the data distribution compared to the mean value. the median is the value separating the higher half from the lower half of a data sample.
+* Maximum: The NDVI maximum allow us to understand the maximum value found in the matrix, what might imply the existence of Forest or Dense vegetation coverages
+* Minimum: The NDVI minimum allow us to understand the maximum value found in the matrix, what might imply the existence of Arid coverages
+* Standard deviation: The NDVI std represent the spread of the data. A low standard deviation indicates that the values tend to be close to the mean (also called the expected value) of the set, while a high standard deviation indicates that the values are spread out over a wider range.
 
 ###  Limitations
 
