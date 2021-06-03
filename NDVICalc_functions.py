@@ -3,12 +3,9 @@ import datetime as date
 from dateutil.relativedelta import *
 import json
 import numpy as np
-import matplotlib.pyplot as plt
 import rasterio as rio
-from rasterio import mask
 import time
 import intake
-from scipy import stats as st
 from pyproj import Proj, transform
 
 def data_requesting_Element84(geojson,cloud): 
@@ -155,7 +152,9 @@ def calculate_stats(stats,ndvi):
             r = np.nanmedian(ndvi)
         elif(i == 'mode'):
             print("[INDEX] Calculating", i)
-            r = np.nanmean(ndvi) # CHECK THE FUNCTION
+            vals,counts = np.unique(ndvi, return_counts=True)
+            r = vals[np.argmax(counts)]
+            #r = st.mode(ndvi,nan_policy ="omit")[0] # CHECK THE FUNCTION
         elif(i == 'max'):
             print("[INDEX] Calculating", i)
             r = np.nanmax(ndvi)
