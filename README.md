@@ -52,13 +52,13 @@ The command argument *dates* is **still under development** and even thought is 
 
 The script allows the user the estimation of different statistics:
 
-* **Mean:** NDVI mean represent the general value in the hole area. Be cautious about how to interpret this number.
+- **Mean:** NDVI mean represent the general value in the hole area. Be cautious about how to interpret this number.
 
-* **Mode:** NDVI mode represent the more repetitive value found in the image. This might help to understand how the mean is related to the most frequent value.
-* **Median:** The NDVI median might help you to understand the asymmetry of the data distribution compared to the mean value. the median is the value separating the higher half from the lower half of a data sample.
-* **Maximum:** The NDVI maximum allow us to understand the maximum value found in the matrix, what might imply the existence of Forest or Dense vegetation coverages
-* **Minimum:** The NDVI minimum allow us to understand the maximum value found in the matrix, what might imply the existence of Arid coverages
-* **Standard deviation:** The NDVI std represent the spread of the data. A low standard deviation indicates that the values tend to be close to the mean (also called the expected value) of the set, while a high standard deviation indicates that the values are spread out over a wider range.
+- **Mode:** NDVI mode represent the more repetitive value found in the image. This might help to understand how the mean is related to the most frequent value.
+- **Median:** The NDVI median might help you to understand the asymmetry of the data distribution compared to the mean value. the median is the value separating the higher half from the lower half of a data sample.
+- **Maximum:** The NDVI maximum allow us to understand the maximum value found in the matrix, what might imply the existence of Forest or Dense vegetation coverages
+- **Minimum:** The NDVI minimum allow us to understand the maximum value found in the matrix, what might imply the existence of Arid coverages
+- **Standard deviation:** The NDVI std represent the spread of the data. A low standard deviation indicates that the values tend to be close to the mean (also called the expected value) of the set, while a high standard deviation indicates that the values are spread out over a wider range.
 
 ###  Limitations
 
